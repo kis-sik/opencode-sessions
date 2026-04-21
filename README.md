@@ -1,4 +1,4 @@
-# ocs
+# opencode-sessions
 
 OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed statistics and management tools.
 
@@ -47,12 +47,8 @@ uv add opencode-sessions
 #### From PyPI
 ```bash
 pip install opencode-sessions
-# After installation, use: ocs
-```
-
-#### Using pip (traditional)
-```bash
-pip install opencode-sessions
+# After installation, use: opencode-sessions
+# Alias: ocs
 ```
 
 #### One-command install
@@ -62,10 +58,7 @@ curl -sL https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/instal
 
 #### Manual installation
 ```bash
-# Install via pip
-pip install opencode-sessions
-
-# Or install Fish autocompletion manually
+# Install Fish autocompletion manually
 cp opencode-sessions.fish ~/.config/fish/completions/
 source ~/.config/fish/config.fish
 ```
@@ -83,15 +76,7 @@ pip install -e .
 pip install .
 ```
 
-### Manual installation
-```bash
-# Install via pip
-pip install ocs
 
-# Or install Fish autocompletion manually
-cp ocs.fish ~/.config/fish/completions/
-source ~/.config/fish/config.fish
-```
 
 ## Uninstallation
 ```bash
@@ -148,7 +133,7 @@ ocs --help
 
 ## Interactive Selection with fzf
 
-For users with `fzf` installed, `ocs --rename-fzf` provides an interactive interface:
+For users with `fzf` installed, `opencode-sessions --rename-fzf` provides an interactive interface:
 
 1. **Fuzzy search** through all sessions
 2. **Preview details** - tokens, cost, date
@@ -183,7 +168,7 @@ The package includes an OpenCode plugin that adds enhanced session commands to t
 
 ```bash
 # Copy plugin to OpenCode plugins directory
-cp ocs-plugin.js ~/.config/opencode/plugins/
+cp opencode-sessions-plugin.js ~/.config/opencode/plugins/
 ```
 
 ### Plugin commands in OpenCode TUI:
@@ -199,14 +184,15 @@ cp ocs-plugin.js ~/.config/opencode/plugins/
 
 ### Project Structure
 ```
-ocs/
+opencode-sessions/
 ├── src/                        # Python source code
-│   └── ocs/                   # Main package
+│   └── ocs/                   # Main package (import name)
 │       ├── __init__.py        # Package metadata
 │       └── main.py            # CLI entry point
 ├── pyproject.toml             # Python package configuration
-├── ocs.fish                   # Fish shell autocompletion
-├── ocs-plugin.js              # OpenCode plugin
+├── opencode-sessions.fish     # Fish shell autocompletion
+├── opencode-sessions-plugin.js # OpenCode plugin
+├── install.sh                 # One-command installer
 ├── LICENSE                    # MIT License
 └── README.md                  # This file
 ```

@@ -1,0 +1,22 @@
+# PyPI Configuration Template
+# 1. Go to https://pypi.org
+# 2. Create account or login
+# 3. Go to Account Settings → API tokens
+# 4. Create new token with scope: "Entire account" (for first package)
+# 5. Copy token: pypi-...
+# 6. Create ~/.pypirc with this content:
+
+[pypi]
+username = __token__
+password = pypi-ваш_токен_здесь
+
+# 7. Set permissions:
+# chmod 600 ~/.pypirc
+
+# Alternative: Environment variables
+# export TWINE_USERNAME="__token__"
+# export TWINE_PASSWORD="pypi-ваш_токен_здесь"
+
+# Test with:
+# uv publish --dry-run
+# uv publish
