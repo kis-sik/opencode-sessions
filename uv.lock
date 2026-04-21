@@ -1,0 +1,11 @@
+version = 1
+requires-python = ">=3.7"
+
+[[package]]
+name = "ocs"
+version = "1.0.0"
+source = { virtual = "." }
+dependencies = []
+
+[package.metadata]
+requires-dist = []

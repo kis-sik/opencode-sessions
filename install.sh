@@ -13,8 +13,12 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-# Install via pip (preferred)
-if command -v pip &> /dev/null || command -v pip3 &> /dev/null; then
+# Install via uv (preferred, modern & fast)
+if command -v uv &> /dev/null; then
+    echo "Installing via uv..."
+    uvx --from ocs --global
+# Install via pip (fallback)
+elif command -v pip &> /dev/null || command -v pip3 &> /dev/null; then
     echo "Installing via pip..."
     pip install ocs 2>/dev/null || pip3 install ocs
 else

@@ -33,6 +33,14 @@ dependencies = []
 [project.scripts]
 ocs = "ocs.main:main"
 
+[tool.uv]
+# uv-specific configuration
+lockfile = "uv.lock"
+
+[tool.uvx]
+# Configuration for uvx
+# Users can run: uvx ocs --help
+
 [project.urls]
 Homepage = "https://github.com/kis-sik/opencode-sessions"
 Repository = "https://github.com/kis-sik/opencode-sessions.git"

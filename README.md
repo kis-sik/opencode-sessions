@@ -18,11 +18,23 @@ OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed stat
 ## Installation
 
 ### Quick installation (recommended)
-```bash
-# Install from PyPI
-pip install ocs
 
-# Or install with one command
+#### Using uv (modern & fast)
+```bash
+# Run without installation
+uvx ocs --help
+
+# Install globally
+uvx --from ocs --global
+```
+
+#### Using pip (traditional)
+```bash
+pip install ocs
+```
+
+#### One-command install
+```bash
 curl -sL https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/install.sh | bash
 ```
 
@@ -149,10 +161,15 @@ pip install dist/opencode_sessions-*.whl
 
 ### Publishing to PyPI
 ```bash
-# Build package
+# Build package (with uv)
+uv build
+
+# Or with traditional tools
 python -m build
 
 # Upload to PyPI
+uv publish
+# or
 python -m twine upload dist/*
 ```
 
