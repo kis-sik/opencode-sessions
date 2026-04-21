@@ -4,6 +4,24 @@
 
 ## Установка
 
+### Самодостаточная установка (рекомендуется)
+Скрипт содержит встроенные команды установки:
+
+```bash
+# Установить для текущего пользователя
+./opencode-sessions --install
+
+# Установить системно (для всех пользователей, требует sudo)
+sudo ./opencode-sessions --install-system
+
+# Удалить для текущего пользователя
+./opencode-sessions --uninstall
+
+# Удалить системно (требует sudo)
+sudo ./opencode-sessions --uninstall-system
+```
+
+### Ручная установка
 1. Скопируйте скрипт в PATH:
 ```bash
 cp opencode-sessions ~/.local/bin/

@@ -10,6 +10,12 @@ Usage:
   opencode-sessions --stats            # session count per project
   opencode-sessions --delete <name>    # delete by name or UUID
   opencode-sessions --delete-unnamed   # delete all without custom name
+  
+Installation commands:
+  opencode-sessions --install          # install for current user
+  opencode-sessions --install-system   # install system-wide (requires sudo)
+  opencode-sessions --uninstall        # uninstall from current user
+  opencode-sessions --uninstall-system # uninstall system-wide (requires sudo)
 """
 
 import sqlite3
@@ -392,10 +398,117 @@ def cmd_rm_unnamed(sessions):
         print("Cancelled.")
 
 
+def install_script(system=False):
+    """Install opencode-sessions"""
+    script_path = os.path.abspath(__file__)
+    script_dir = os.path.dirname(script_path)
+    script_name = os.path.basename(script_path)
+    completion_name = "opencode-sessions.fish"
+    
+    # Installation paths
+    if system:
+        if os.geteuid() != 0:
+            print("System installation requires root privileges. Use sudo.")
+            sys.exit(1)
+        install_dir = "/usr/local/bin"
+        completion_dir = "/etc/fish/completions"
+    else:
+        install_dir = os.path.expanduser("~/.local/bin")
+        completion_dir = os.path.expanduser("~/.config/fish/completions")
+    
+    print(f"Installing {script_name}...")
+    
+    # Create directories
+    os.makedirs(install_dir, exist_ok=True)
+    if os.path.exists(os.path.dirname(completion_dir)):
+        os.makedirs(completion_dir, exist_ok=True)
+    
+    # Install main script
+    dest_script = os.path.join(install_dir, script_name)
+    print(f"Copying {script_name} to {dest_script}")
+    
+    # Read current script content
+    with open(script_path, 'r') as f:
+        script_content = f.read()
+    
+    # Write to destination
+    with open(dest_script, 'w') as f:
+        f.write(script_content)
+    
+    # Make executable
+    os.chmod(dest_script, 0o755)
+    
+    # Install fish completion if available
+    completion_src = os.path.join(script_dir, completion_name)
+    if os.path.exists(completion_src):
+        dest_completion = os.path.join(completion_dir, completion_name)
+        print(f"Copying {completion_name} to {dest_completion}")
+        with open(completion_src, 'r') as f:
+            completion_content = f.read()
+        with open(dest_completion, 'w') as f:
+            f.write(completion_content)
+        print("Fish completion installed. Restart your shell or run: source ~/.config/fish/config.fish")
+    
+    print(f"\nInstallation complete!")
+    print(f"You can now use: {script_name}")
+    print(f"Try: {script_name} --help")
+
+
+def uninstall_script(system=False):
+    """Uninstall opencode-sessions"""
+    script_name = os.path.basename(__file__)
+    completion_name = "opencode-sessions.fish"
+    
+    # Installation paths
+    if system:
+        if os.geteuid() != 0:
+            print("System uninstallation requires root privileges. Use sudo.")
+            sys.exit(1)
+        install_dir = "/usr/local/bin"
+        completion_dir = "/etc/fish/completions"
+    else:
+        install_dir = os.path.expanduser("~/.local/bin")
+        completion_dir = os.path.expanduser("~/.config/fish/completions")
+    
+    print(f"Uninstalling {script_name}...")
+    
+    # Remove main script
+    script_path = os.path.join(install_dir, script_name)
+    if os.path.exists(script_path):
+        print(f"Removing {script_path}")
+        os.remove(script_path)
+    else:
+        print(f"{script_path} not found")
+    
+    # Remove fish completion
+    completion_path = os.path.join(completion_dir, completion_name)
+    if os.path.exists(completion_path):
+        print(f"Removing {completion_path}")
+        os.remove(completion_path)
+    else:
+        print(f"{completion_path} not found")
+    
+    print("Uninstallation complete!")
+
+
 def main():
     args = sys.argv[1:]
     
-    # Load sessions
+    # Check for installation commands first
+    if "--install" in args:
+        install_script(system=False)
+        return
+    elif "--install-system" in args:
+        install_script(system=True)
+        return
+    elif "--uninstall" in args:
+        uninstall_script(system=False)
+        return
+    elif "--uninstall-system" in args:
+        uninstall_script(system=True)
+        return
+    
+    # Load sessions for regular commands
     sessions = load_sessions()
     
     # Check for sort flags
@@ -404,7 +517,7 @@ def main():
     sort_cost = "--sort-cost" in args
     sort_messages = "--sort-messages" in args
     
-    # Handle commands
+    # Handle regular commands
     if "--help" in args or "-h" in args:
         print(__doc__)
     elif "--stats" in args:
