@@ -44,7 +44,7 @@ curl -sL https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/instal
 git clone https://github.com/kis-sik/opencode-sessions.git
 cd opencode-sessions
 
-# Install for current user
+# Install in development mode
 pip install -e .
 
 # Or install globally
@@ -53,22 +53,21 @@ pip install .
 
 ### Manual installation
 ```bash
-# Copy script
-cp opencode-sessions ~/.local/bin/
-chmod +x ~/.local/bin/opencode-sessions
+# Install via pip
+pip install ocs
 
-# Install Fish autocompletion
-cp opencode-sessions.fish ~/.config/fish/completions/
+# Or install Fish autocompletion manually
+cp ocs.fish ~/.config/fish/completions/
 source ~/.config/fish/config.fish
 ```
 
 ## Uninstallation
 ```bash
-# Uninstall for current user
-opencode-sessions --uninstall
+# Uninstall via pip
+pip uninstall ocs
 
-# Uninstall system-wide
-sudo opencode-sessions --uninstall-system
+# Remove Fish completion
+rm ~/.config/fish/completions/ocs.fish 2>/dev/null || true
 ```
 
 ## Usage
