@@ -1,0 +1,41 @@
+{
+  "name": "opencode-sessions",
+  "version": "1.0.0",
+  "description": "Enhanced OpenCode session manager with detailed statistics and management tools",
+  "main": "opencode-sessions-plugin.js",
+  "bin": {
+    "opencode-sessions": "./opencode-sessions"
+  },
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "opencode",
+    "session",
+    "management",
+    "statistics",
+    "ai",
+    "coding",
+    "agent"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/opencode-sessions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/opencode-sessions/issues"
+  },
+  "homepage": "https://github.com/yourusername/opencode-sessions#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "opencode-sessions",
+    "opencode-sessions.fish",
+    "opencode-sessions-plugin.js",
+    "README.md",
+    "LICENSE"
+  ]
+}
