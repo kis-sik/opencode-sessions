@@ -3,17 +3,28 @@
 OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed statistics and management tools.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue)](https://github.com/kis-sik/opencode-sessions/releases/tag/v1.2.0)
 
 ## Features
 
 - 📊 **Table output** with token, cost, and message statistics
 - 🔄 **Sorting** by date, tokens, cost, messages
 - 🗑️ **Session deletion** by name or UUID
+- ✏️ **Session renaming** - rename sessions by name or UUID
 - 📈 **Detailed statistics** per project
 - 🐟 **Autocompletion** for Fish shell
 - 🔧 **Self-installation** - script installs itself
 - 🎯 **claude-sessions interface** - familiar UX
 - 🔌 **OpenCode plugin** - integrates with OpenCode TUI
+
+## What's New in v1.2.0
+
+- **Session renaming**: `ocs --rename <old> <new>` - rename sessions by name or UUID
+- **Improved help**: Updated usage documentation with new commands
+- **Better installation**: Fixed completion file paths and script naming
+- **Unified naming**: All references updated from `opencode-sessions` to `ocs`
+- **Modern Python tools**: Full support for `uv` and `uvx`
+- **Proper package structure**: `src/` layout with dynamic versioning
 
 ## Installation
 
@@ -82,6 +93,7 @@ ocs --sort-messages    # sort by message count (highest first)
 ocs --stats            # session count per project
 ocs --delete <name>    # delete by name or UUID
 ocs --delete-unnamed   # delete all without custom name
+ocs --rename <old> <new> # rename session
 ```
 
 ## Examples
@@ -95,6 +107,9 @@ ocs --print-all --sort-tokens
 
 # Delete session by name
 ocs --delete "Firewall"
+
+# Rename a session
+ocs --rename "old name" "new name"
 
 # Show statistics
 ocs --stats
