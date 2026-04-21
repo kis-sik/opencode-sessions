@@ -1,75 +1,150 @@
-# Publishing Instructions
+# Публикация ocs на PyPI
 
-## Step 1: Configure GitHub Authentication
+## Подготовка
 
-### Option A: SSH Keys (Recommended)
+### 1. Зарегистрироваться на PyPI
+- Перейти на https://pypi.org
+- Создать аккаунт (если нет)
+- Подтвердить email
+
+### 2. Создать API токен
+- Войти в аккаунт PyPI
+- Перейти в Account Settings → API tokens
+- Создать новый токен с scope:
+  - `Entire account` (для первого пакета)
+  - Или `opencode-sessions` (ограниченный доступ)
+- Скопировать токен: `pypi-...`
+
+### 3. Настроить аутентификацию
+
+#### Вариант A: Файл `.pypirc`
 ```bash
-# Generate SSH key if you don't have one
-ssh-keygen -t ed25519 -C "your-email@example.com"
+# Создать файл ~/.pypirc
+cat > ~/.pypirc << 'EOF'
+[pypi]
+username = __token__
+password = pypi-ваш_токен_здесь
+EOF
 
-# Add SSH key to GitHub
-cat ~/.ssh/id_ed25519.pub
-# Copy the output and add to GitHub: https://github.com/settings/keys
+# Установить правильные права
+chmod 600 ~/.pypirc
 ```
 
-### Option B: Personal Access Token
+#### Вариант B: Переменные окружения
 ```bash
-# Create token at: https://github.com/settings/tokens
-# Select "repo" scope
-
-# Push with token
-git push https://<TOKEN>@github.com/kis-sik/opencode-sessions.git main
+export TWINE_USERNAME="__token__"
+export TWINE_PASSWORD="pypi-ваш_токен_здесь"
 ```
 
-## Step 2: Push to GitHub
-
+#### Вариант C: Конфигурация uv
 ```bash
-cd ~/tech/opencode-sessions
-
-# Set remote
-git remote add origin https://github.com/kis-sik/opencode-sessions.git
-
-# Push code
-git push -u origin main
-
-# Create tag
-git tag v1.0.0
-git push origin v1.0.0
+# Создать файл ~/.config/uv/auth.json
+mkdir -p ~/.config/uv
+cat > ~/.config/uv/auth.json << 'EOF'
+{
+  "https://upload.pypi.org/legacy/": {
+    "username": "__token__",
+    "password": "pypi-ваш_токен_здесь"
+  }
+}
+EOF
 ```
 
-## Step 3: Update README URLs
+## Публикация
 
-Edit `README.md` and replace:
-- `https://raw.githubusercontent.com/yourusername/opencode-sessions/main/`
-- `https://github.com/yourusername/opencode-sessions.git`
-
-With:
-- `https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/`
-- `https://github.com/kis-sik/opencode-sessions.git`
-
-## Step 4: Publish to npm (Optional)
-
+### 1. Собрать дистрибутивы
 ```bash
-# Login to npm
-npm login
-
-# Update package.json with correct repository URL
-# Then publish
-npm publish
+cd ~/tech/ocs
+uv build
 ```
 
-## Repository is Ready
-
-The repository contains:
-- ✅ `opencode-sessions` - Main Python script
-- ✅ `opencode-sessions.fish` - Fish autocompletion
-- ✅ `opencode-sessions-plugin.js` - OpenCode plugin
-- ✅ `package.json` - npm configuration
-- ✅ `LICENSE` - MIT License
-- ✅ `README.md` - Documentation
-- ✅ `.gitignore` - Ignored files
-
-Once published, users can install with:
+### 2. Проверить дистрибутивы
 ```bash
-curl -sL https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/opencode-sessions | python3 - --install
+# Проверить wheel
+uvx twine check dist/*
+
+# Проверить метаданные
+python3 -m twine check dist/*
 ```
+
+### 3. Опубликовать
+```bash
+# Используя uv
+uv publish
+
+# Или используя twine
+uvx twine upload dist/*
+```
+
+### 4. Проверить публикацию
+```bash
+# Через несколько минут
+pip install opencode-sessions
+# или
+uv add opencode-sessions
+```
+
+## Важные моменты
+
+### Имя пакета
+- На PyPI: `opencode-sessions` (доступно)
+- Импорт: `import ocs`
+- CLI команда: `ocs`
+
+### Версионирование
+- Текущая версия: 1.3.0
+- Следуем SemVer: MAJOR.MINOR.PATCH
+- Теги на GitHub: v1.0.0, v1.1.0, v1.2.0, v1.3.0
+
+### Метаданные
+- `pyproject.toml` содержит все необходимые метаданные
+- README.md используется как long_description
+- MIT лицензия
+- Python >=3.7
+
+## После публикации
+
+### 1. Обновить документацию
+```bash
+# Обновить README с PyPI бейджами
+echo "[![PyPI version](https://badge.fury.io/py/opencode-sessions.svg)](https://pypi.org/project/opencode-sessions/)" >> README.md
+```
+
+### 2. Создать релиз на GitHub
+```bash
+# Создать релиз v1.3.0 с дистрибутивами
+gh release create v1.3.0 \
+  --title "ocs v1.3.0" \
+  --notes "Interactive rename with fzf" \
+  dist/ocs-1.3.0-py3-none-any.whl \
+  dist/ocs-1.3.0.tar.gz
+```
+
+### 3. Протестировать установку
+```bash
+# Чистая установка
+pip uninstall -y opencode-sessions
+pip install opencode-sessions
+ocs --help
+```
+
+## Устранение проблем
+
+### Ошибка: "Package already exists"
+- Имя `ocs` уже занято (версия 0.12.0)
+- Используем `opencode-sessions`
+- Обновить `pyproject.toml` если нужно
+
+### Ошибка: "Missing credentials"
+- Проверить `.pypirc` или переменные окружения
+- Убедиться что токен правильный
+- Попробовать `uv publish --token pypi-...`
+
+### Ошибка: "Invalid version"
+- Проверить формат версии в `pyproject.toml`
+- Должно быть: `1.3.0` (не `v1.3.0`)
+
+## Ссылки
+- PyPI: https://pypi.org/project/opencode-sessions/
+- GitHub: https://github.com/kis-sik/opencode-sessions
+- Документация: README.md

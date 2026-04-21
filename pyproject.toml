@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ocs"
+name = "opencode-sessions"
 version = "1.3.0"
 description = "Enhanced OpenCode session manager with detailed statistics"
 readme = "README.md"
@@ -32,6 +32,7 @@ dependencies = []
 
 [project.scripts]
 ocs = "ocs.main:main"
+opencode-sessions = "ocs.main:main"
 
 [tool.uv]
 # uv-specific configuration
@@ -39,6 +40,7 @@ ocs = "ocs.main:main"
 [tool.uvx]
 # Configuration for uvx
 # Users can run: uvx ocs --help
+# or: uvx opencode-sessions --help
 
 [project.urls]
 Homepage = "https://github.com/kis-sik/opencode-sessions"

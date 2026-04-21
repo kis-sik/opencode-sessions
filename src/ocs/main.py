@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """
 Usage:
-  ocs                                  # sessions for current directory
-  ocs --print-all                      # all sessions
-  ocs --sort-date                      # sort by date (newest first)
-  ocs --sort-tokens                    # sort by token count (highest first)
-  ocs --sort-cost                      # sort by cost (highest first)
-  ocs --sort-messages                  # sort by message count (highest first)
-  ocs --stats                          # session count per project
-  ocs --delete <name>                  # delete by name or UUID
-  ocs --delete-unnamed                 # delete all without custom name
-  ocs --rename <old> <new>             # rename session
-  ocs --rename-fzf                     # interactive rename with fzf
+  opencode-sessions                    # sessions for current directory
+  opencode-sessions --print-all        # all sessions
+  opencode-sessions --sort-date        # sort by date (newest first)
+  opencode-sessions --sort-tokens      # sort by token count (highest first)
+  opencode-sessions --sort-cost        # sort by cost (highest first)
+  opencode-sessions --sort-messages    # sort by message count (highest first)
+  opencode-sessions --stats            # session count per project
+  opencode-sessions --delete <name>    # delete by name or UUID
+  opencode-sessions --delete-unnamed   # delete all without custom name
+  opencode-sessions --rename <old> <new> # rename session
+  opencode-sessions --rename-fzf       # interactive rename with fzf
   
 Installation commands:
-  ocs --install                        # install for current user
-  ocs --install-system                 # install system-wide (requires sudo)
-  ocs --uninstall                      # uninstall from current user
-  ocs --uninstall-system               # uninstall system-wide (requires sudo)
+  opencode-sessions --install          # install for current user
+  opencode-sessions --install-system   # install system-wide (requires sudo)
+  opencode-sessions --uninstall        # uninstall from current user
+  opencode-sessions --uninstall-system # uninstall system-wide (requires sudo)
+
+Alias: ocs (same as opencode-sessions)
 """
 
 import sqlite3
@@ -582,8 +584,8 @@ def install_script(system=False):
     """Install ocs"""
     script_path = os.path.abspath(__file__)
     script_dir = os.path.dirname(script_path)
-    script_name = "ocs"
-    completion_name = "ocs.fish"
+    script_name = "opencode-sessions"
+    completion_name = "opencode-sessions.fish"
     
     # Installation paths
     if system:
@@ -605,7 +607,7 @@ def install_script(system=False):
     
     # Install main script
     dest_script = os.path.join(install_dir, script_name)
-    print(f"Copying ocs to {dest_script}")
+    print(f"Copying {script_name} to {dest_script}")
     
     # Read current script content
     with open(script_path, 'r') as f:
@@ -619,15 +621,25 @@ def install_script(system=False):
     os.chmod(dest_script, 0o755)
     
     # Install fish completion if available
-    completion_src = os.path.join(script_dir, "..", "..", completion_name)
+    completion_src = os.path.join(script_dir, "..", "..", "ocs.fish")
     if os.path.exists(completion_src):
         dest_completion = os.path.join(completion_dir, completion_name)
-        print(f"Copying {completion_name} to {dest_completion}")
+        print(f"Copying fish completion to {dest_completion}")
         with open(completion_src, 'r') as f:
             completion_content = f.read()
         with open(dest_completion, 'w') as f:
             f.write(completion_content)
         print("Fish completion installed. Restart your shell or run: source ~/.config/fish/config.fish")
+    
+    # Create ocs alias symlink
+    ocs_symlink = os.path.join(install_dir, "ocs")
+    if not os.path.exists(ocs_symlink):
+        try:
+            os.symlink(dest_script, ocs_symlink)
+            print(f"Created alias: ocs -> {script_name}")
+        except OSError as e:
+            print(f"Note: Could not create ocs alias: {e}")
+            print("You can still use: opencode-sessions")
     
     print(f"\nInstallation complete!")
     print(f"You can now use: {script_name}")
@@ -661,12 +673,18 @@ def uninstall_script(system=False):
         print(f"{script_path} not found")
     
     # Remove fish completion
-    completion_path = os.path.join(completion_dir, completion_name)
+    completion_path = os.path.join(completion_dir, "opencode-sessions.fish")
     if os.path.exists(completion_path):
         print(f"Removing {completion_path}")
         os.remove(completion_path)
     else:
         print(f"{completion_path} not found")
+    
+    # Remove ocs alias symlink
+    ocs_symlink = os.path.join(install_dir, "ocs")
+    if os.path.exists(ocs_symlink):
+        print(f"Removing alias: {ocs_symlink}")
+        os.remove(ocs_symlink)
     
     print("Uninstallation complete!")
 
@@ -720,7 +738,7 @@ def main():
         idx = args.index("--rename")
         rest = args[idx + 1:]
         if len(rest) < 2:
-            print("Usage: ocs --rename <old-name-or-id> <new-name>")
+            print("Usage: opencode-sessions --rename <old-name-or-id> <new-name>")
             sys.exit(1)
         old_name = rest[0]
         new_name = " ".join(rest[1:])

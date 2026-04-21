@@ -3,6 +3,7 @@
 OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed statistics and management tools.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://img.shields.io/pypi/v/opencode-sessions.svg)](https://pypi.org/project/opencode-sessions/)
 [![Version](https://img.shields.io/badge/version-1.3.0-blue)](https://github.com/kis-sik/opencode-sessions/releases/tag/v1.3.0)
 
 ## Features
@@ -19,13 +20,13 @@ OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed stat
 
 ## What's New in v1.3.0
 
-- **Interactive rename with fzf**: `ocs --rename-fzf` - fuzzy search and interactive selection
-- **Session renaming**: `ocs --rename <old> <new>` - rename sessions by name or UUID
+- **Interactive rename with fzf**: `opencode-sessions --rename-fzf` - fuzzy search and interactive selection
+- **Session renaming**: `opencode-sessions --rename <old> <new>` - rename sessions by name or UUID
 - **Improved help**: Updated usage documentation with new commands
 - **Better installation**: Fixed completion file paths and script naming
-- **Unified naming**: All references updated from `opencode-sessions` to `ocs`
 - **Modern Python tools**: Full support for `uv` and `uvx`
 - **Proper package structure**: `src/` layout with dynamic versioning
+- **PyPI ready**: Package name: `opencode-sessions`, import: `ocs`
 
 ## Installation
 
@@ -34,20 +35,39 @@ OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed stat
 #### Using uv (modern & fast)
 ```bash
 # Run without installation
-uvx ocs --help
+uvx opencode-sessions --help
 
-# Install globally
-uvx --from ocs --global
+# Install from PyPI
+uvx --from opencode-sessions --global
+
+# Or install locally
+uv add opencode-sessions
+```
+
+#### From PyPI
+```bash
+pip install opencode-sessions
+# After installation, use: ocs
 ```
 
 #### Using pip (traditional)
 ```bash
-pip install ocs
+pip install opencode-sessions
 ```
 
 #### One-command install
 ```bash
 curl -sL https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/install.sh | bash
+```
+
+#### Manual installation
+```bash
+# Install via pip
+pip install opencode-sessions
+
+# Or install Fish autocompletion manually
+cp opencode-sessions.fish ~/.config/fish/completions/
+source ~/.config/fish/config.fish
 ```
 
 ### From source
@@ -76,48 +96,54 @@ source ~/.config/fish/config.fish
 ## Uninstallation
 ```bash
 # Uninstall via pip
-pip uninstall ocs
+pip uninstall opencode-sessions
 
 # Remove Fish completion
-rm ~/.config/fish/completions/ocs.fish 2>/dev/null || true
+rm ~/.config/fish/completions/opencode-sessions.fish 2>/dev/null || true
 ```
 
 ## Usage
 
 ```
-ocs                    # sessions for current directory
-ocs --print-all        # all sessions
-ocs --sort-date        # sort by date (newest first)
-ocs --sort-tokens      # sort by token count (highest first)
-ocs --sort-cost        # sort by cost (highest first)
-ocs --sort-messages    # sort by message count (highest first)
-ocs --stats            # session count per project
-ocs --delete <name>    # delete by name or UUID
-ocs --delete-unnamed   # delete all without custom name
-ocs --rename <old> <new> # rename session
-ocs --rename-fzf       # interactive rename with fzf
+opencode-sessions                    # sessions for current directory
+opencode-sessions --print-all        # all sessions
+opencode-sessions --sort-date        # sort by date (newest first)
+opencode-sessions --sort-tokens      # sort by token count (highest first)
+opencode-sessions --sort-cost        # sort by cost (highest first)
+opencode-sessions --sort-messages    # sort by message count (highest first)
+opencode-sessions --stats            # session count per project
+opencode-sessions --delete <name>    # delete by name or UUID
+opencode-sessions --delete-unnamed   # delete all without custom name
+opencode-sessions --rename <old> <new> # rename session
+opencode-sessions --rename-fzf       # interactive rename with fzf
+
+# Alias: ocs (same as opencode-sessions)
+ocs --help
 ```
 
 ## Examples
 
 ```bash
 # Show sessions for current project
-ocs
+opencode-sessions
 
 # Show all sessions sorted by tokens
-ocs --print-all --sort-tokens
+opencode-sessions --print-all --sort-tokens
 
 # Delete session by name
-ocs --delete "Firewall"
+opencode-sessions --delete "Firewall"
 
 # Rename a session
-ocs --rename "old name" "new name"
+opencode-sessions --rename "old name" "new name"
 
 # Interactive rename with fzf
-ocs --rename-fzf
+opencode-sessions --rename-fzf
 
 # Show statistics
-ocs --stats
+opencode-sessions --stats
+
+# Using alias (ocs)
+ocs --help
 ```
 
 ## Interactive Selection with fzf
@@ -144,8 +170,9 @@ sudo pacman -S fzf
 ## Autocompletion in Fish
 
 After installation:
-- `ocs <Tab>` - option hints
-- `ocs --delete <Tab>` - list of available sessions
+- `opencode-sessions <Tab>` - option hints
+- `opencode-sessions --delete <Tab>` - list of available sessions
+- `ocs <Tab>` - same for alias
 - Works with all flags
 
 ## OpenCode Plugin Integration
