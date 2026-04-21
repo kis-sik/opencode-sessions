@@ -41,14 +41,14 @@ curl -sL https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/instal
 ### From source
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/opencode-sessions.git
+git clone https://github.com/kis-sik/opencode-sessions.git
 cd opencode-sessions
 
 # Install for current user
-./opencode-sessions --install
+pip install -e .
 
-# Or install system-wide (for all users)
-sudo ./opencode-sessions --install-system
+# Or install globally
+pip install .
 ```
 
 ### Manual installation
