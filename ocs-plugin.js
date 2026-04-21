@@ -1,8 +1,8 @@
 // OpenCode plugin for enhanced session management
 // Place in ~/.config/opencode/plugins/ or .opencode/plugins/
 
-export const OpenCodeSessionsPlugin = async ({ project, client, $, directory, worktree }) => {
-  console.log("OpenCode Sessions Plugin initialized")
+export const OCSPlugin = async ({ project, client, $, directory, worktree }) => {
+  console.log("OCS Plugin initialized")
   
   return {
     // Add custom commands to opencode
@@ -10,12 +10,12 @@ export const OpenCodeSessionsPlugin = async ({ project, client, $, directory, wo
       const command = input.command.trim()
       
       // Handle custom session commands
-      if (command.startsWith("/session-stats")) {
+      if (command.startsWith("/ocs-stats")) {
         output.handled = true
         
         try {
           // Run our opencode-sessions script
-          const result = await $`opencode-sessions --stats`
+          const result = await $`ocs --stats`
           await client.app.log({
             body: {
               service: "opencode-sessions-plugin",
@@ -39,7 +39,7 @@ export const OpenCodeSessionsPlugin = async ({ project, client, $, directory, wo
         }
       }
       
-      if (command.startsWith("/session-list-detailed")) {
+      if (command.startsWith("/ocs-list")) {
         output.handled = true
         
         try {
@@ -63,10 +63,10 @@ export const OpenCodeSessionsPlugin = async ({ project, client, $, directory, wo
             opencodeArgs += " --sort-messages"
           }
           
-          const result = await $`opencode-sessions ${opencodeArgs}`
+            const result = await $`ocs ${opencodeArgs}`
           await client.app.log({
             body: {
-              service: "opencode-sessions-plugin",
+              service: "ocs-plugin",
               level: "info",
               message: "Detailed session list generated"
             }
@@ -86,7 +86,7 @@ export const OpenCodeSessionsPlugin = async ({ project, client, $, directory, wo
         }
       }
       
-      if (command.startsWith("/session-delete")) {
+      if (command.startsWith("/ocs-delete")) {
         output.handled = true
         
         try {
@@ -104,10 +104,10 @@ export const OpenCodeSessionsPlugin = async ({ project, client, $, directory, wo
             opencodeArgs = `--delete "${args.join(' ')}"`
           }
           
-          const result = await $`opencode-sessions ${opencodeArgs}`
+            const result = await $`ocs ${opencodeArgs}`
           await client.app.log({
             body: {
-              service: "opencode-sessions-plugin",
+              service: "ocs-plugin",
               level: "info",
               message: "Session deletion executed"
             }
@@ -131,14 +131,14 @@ export const OpenCodeSessionsPlugin = async ({ project, client, $, directory, wo
     // Add help text for our custom commands
     "tui.prompt.append": async (input, output) => {
       output.append(`
-Available session commands:
-  /session-stats                 - Show detailed session statistics
-  /session-list-detailed         - Show sessions with token/cost metrics
+Available OCS commands:
+  /ocs-stats                 - Show detailed session statistics
+  /ocs-list                  - Show sessions with token/cost metrics
     Options: --all, --sort-tokens, --sort-cost, --sort-date, --sort-messages
-  /session-delete <name|id>      - Delete session by name or ID
+  /ocs-delete <name|id>      - Delete session by name or ID
     Options: --interactive, --unnamed
       
-These commands use the opencode-sessions tool for enhanced session management.
+These commands use the ocs tool for enhanced session management.
 `)
     },
     
@@ -146,7 +146,7 @@ These commands use the opencode-sessions tool for enhanced session management.
     "session.created": async ({ event }) => {
       await client.app.log({
         body: {
-          service: "opencode-sessions-plugin",
+          service: "ocs-plugin",
           level: "info",
           message: "New session created",
           sessionId: event.session.id,
@@ -158,7 +158,7 @@ These commands use the opencode-sessions tool for enhanced session management.
     "session.deleted": async ({ event }) => {
       await client.app.log({
         body: {
-          service: "opencode-sessions-plugin",
+          service: "ocs-plugin",
           level: "info",
           message: "Session deleted",
           sessionId: event.session.id

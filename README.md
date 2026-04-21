@@ -1,6 +1,6 @@
-# opencode-sessions
+# ocs
 
-Enhanced OpenCode session manager with detailed statistics and management tools.
+OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed statistics and management tools.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -19,8 +19,11 @@ Enhanced OpenCode session manager with detailed statistics and management tools.
 
 ### Quick installation (recommended)
 ```bash
-# Download and install with one command
-curl -sL https://raw.githubusercontent.com/yourusername/opencode-sessions/main/opencode-sessions | python3 - --install
+# Install from PyPI
+pip install ocs
+
+# Or install with one command
+curl -sL https://raw.githubusercontent.com/kis-sik/opencode-sessions/main/install.sh | bash
 ```
 
 ### From source
@@ -59,38 +62,38 @@ sudo opencode-sessions --uninstall-system
 ## Usage
 
 ```
-opencode-sessions                    # sessions for current directory
-opencode-sessions --print-all        # all sessions
-opencode-sessions --sort-date        # sort by date (newest first)
-opencode-sessions --sort-tokens      # sort by token count (highest first)
-opencode-sessions --sort-cost        # sort by cost (highest first)
-opencode-sessions --sort-messages    # sort by message count (highest first)
-opencode-sessions --stats            # session count per project
-opencode-sessions --delete <name>    # delete by name or UUID
-opencode-sessions --delete-unnamed   # delete all without custom name
+ocs                    # sessions for current directory
+ocs --print-all        # all sessions
+ocs --sort-date        # sort by date (newest first)
+ocs --sort-tokens      # sort by token count (highest first)
+ocs --sort-cost        # sort by cost (highest first)
+ocs --sort-messages    # sort by message count (highest first)
+ocs --stats            # session count per project
+ocs --delete <name>    # delete by name or UUID
+ocs --delete-unnamed   # delete all without custom name
 ```
 
 ## Examples
 
 ```bash
 # Show sessions for current project
-opencode-sessions
+ocs
 
 # Show all sessions sorted by tokens
-opencode-sessions --print-all --sort-tokens
+ocs --print-all --sort-tokens
 
 # Delete session by name
-opencode-sessions --delete "Firewall"
+ocs --delete "Firewall"
 
 # Show statistics
-opencode-sessions --stats
+ocs --stats
 ```
 
 ## Autocompletion in Fish
 
 After installation:
-- `opencode-sessions <Tab>` - option hints
-- `opencode-sessions --delete <Tab>` - list of available sessions
+- `ocs <Tab>` - option hints
+- `ocs --delete <Tab>` - list of available sessions
 - Works with all flags
 
 ## OpenCode Plugin Integration
@@ -99,27 +102,17 @@ The package includes an OpenCode plugin that adds enhanced session commands to t
 
 ### Install as OpenCode plugin
 
-1. **As npm package** (after publishing):
-```json
-// Add to your opencode.json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-sessions"]
-}
-```
-
-2. **As local plugin**:
 ```bash
 # Copy plugin to OpenCode plugins directory
-cp opencode-sessions-plugin.js ~/.config/opencode/plugins/
+cp ocs-plugin.js ~/.config/opencode/plugins/
 ```
 
 ### Plugin commands in OpenCode TUI:
 ```
-/session-stats                 - Show detailed session statistics
-/session-list-detailed         - Show sessions with token/cost metrics
+/ocs-stats                 - Show detailed session statistics
+/ocs-list                  - Show sessions with token/cost metrics
   Options: --all, --sort-tokens, --sort-cost, --sort-date, --sort-messages
-/session-delete <name|id>      - Delete session by name or ID
+/ocs-delete <name|id>      - Delete session by name or ID
   Options: --interactive, --unnamed
 ```
 
@@ -127,22 +120,40 @@ cp opencode-sessions-plugin.js ~/.config/opencode/plugins/
 
 ### Project Structure
 ```
-opencode-sessions/
-├── opencode-sessions           # Main Python script (self-installable)
-├── opencode-sessions.fish      # Fish shell autocompletion
-├── opencode-sessions-plugin.js # OpenCode plugin
-├── package.json                # npm package configuration
-├── LICENSE                     # MIT License
-└── README.md                   # This file
+ocs/
+├── src/                        # Python source code
+│   └── ocs/                   # Main package
+│       ├── __init__.py        # Package metadata
+│       └── main.py            # CLI entry point
+├── pyproject.toml             # Python package configuration
+├── ocs.fish                   # Fish shell autocompletion
+├── ocs-plugin.js              # OpenCode plugin
+├── LICENSE                    # MIT License
+└── README.md                  # This file
 ```
 
-### Publishing to npm
+### Local Development
 ```bash
-# Login to npm
-npm login
+# Install in development mode
+pip install -e .
 
-# Publish package
-npm publish
+# Run tests (when added)
+pytest
+
+# Build package
+python -m build
+
+# Install from local build
+pip install dist/opencode_sessions-*.whl
+```
+
+### Publishing to PyPI
+```bash
+# Build package
+python -m build
+
+# Upload to PyPI
+python -m twine upload dist/*
 ```
 
 ## License
