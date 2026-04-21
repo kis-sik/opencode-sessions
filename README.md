@@ -3,7 +3,7 @@
 OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed statistics and management tools.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.2.0-blue)](https://github.com/kis-sik/opencode-sessions/releases/tag/v1.2.0)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue)](https://github.com/kis-sik/opencode-sessions/releases/tag/v1.3.0)
 
 ## Features
 
@@ -17,8 +17,9 @@ OpenCode Sessions Manager - Enhanced OpenCode session manager with detailed stat
 - 🎯 **claude-sessions interface** - familiar UX
 - 🔌 **OpenCode plugin** - integrates with OpenCode TUI
 
-## What's New in v1.2.0
+## What's New in v1.3.0
 
+- **Interactive rename with fzf**: `ocs --rename-fzf` - fuzzy search and interactive selection
 - **Session renaming**: `ocs --rename <old> <new>` - rename sessions by name or UUID
 - **Improved help**: Updated usage documentation with new commands
 - **Better installation**: Fixed completion file paths and script naming
@@ -94,6 +95,7 @@ ocs --stats            # session count per project
 ocs --delete <name>    # delete by name or UUID
 ocs --delete-unnamed   # delete all without custom name
 ocs --rename <old> <new> # rename session
+ocs --rename-fzf       # interactive rename with fzf
 ```
 
 ## Examples
@@ -111,8 +113,32 @@ ocs --delete "Firewall"
 # Rename a session
 ocs --rename "old name" "new name"
 
+# Interactive rename with fzf
+ocs --rename-fzf
+
 # Show statistics
 ocs --stats
+```
+
+## Interactive Selection with fzf
+
+For users with `fzf` installed, `ocs --rename-fzf` provides an interactive interface:
+
+1. **Fuzzy search** through all sessions
+2. **Preview details** - tokens, cost, date
+3. **Interactive rename** - select session, enter new name
+4. **Confirmation** - confirm before applying changes
+
+Install fzf:
+```bash
+# macOS
+brew install fzf
+
+# Ubuntu/Debian
+sudo apt install fzf
+
+# Arch
+sudo pacman -S fzf
 ```
 
 ## Autocompletion in Fish

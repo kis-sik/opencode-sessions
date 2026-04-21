@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 """
 Usage:
-  opencode-sessions                    # sessions for current directory
-  opencode-sessions --print-all        # all sessions
-  opencode-sessions --sort-date        # sort by date (newest first)
-  opencode-sessions --sort-tokens      # sort by token count (highest first)
-  opencode-sessions --sort-cost        # sort by cost (highest first)
-  opencode-sessions --sort-messages    # sort by message count (highest first)
-  opencode-sessions --stats            # session count per project
-  opencode-sessions --delete <name>    # delete by name or UUID
-  opencode-sessions --delete-unnamed   # delete all without custom name
+  ocs                                  # sessions for current directory
+  ocs --print-all                      # all sessions
+  ocs --sort-date                      # sort by date (newest first)
+  ocs --sort-tokens                    # sort by token count (highest first)
+  ocs --sort-cost                      # sort by cost (highest first)
+  ocs --sort-messages                  # sort by message count (highest first)
+  ocs --stats                          # session count per project
+  ocs --delete <name>                  # delete by name or UUID
+  ocs --delete-unnamed                 # delete all without custom name
+  ocs --rename <old> <new>             # rename session
+  ocs --rename-fzf                     # interactive rename with fzf
   
 Installation commands:
-  opencode-sessions --install          # install for current user
-  opencode-sessions --install-system   # install system-wide (requires sudo)
-  opencode-sessions --uninstall        # uninstall from current user
-  opencode-sessions --uninstall-system # uninstall system-wide (requires sudo)
+  ocs --install                        # install for current user
+  ocs --install-system                 # install system-wide (requires sudo)
+  ocs --uninstall                      # uninstall from current user
+  ocs --uninstall-system               # uninstall system-wide (requires sudo)
 """
 
 import sqlite3
@@ -398,12 +400,190 @@ def cmd_rm_unnamed(sessions):
         print("Cancelled.")
 
 
+def cmd_rename(sessions, old_name, new_name):
+    """Rename a session"""
+    cwd = os.getcwd()
+    
+    # Filter sessions for current directory
+    pool = [s for s in sessions if s["directory"] and 
+            (s["directory"] == cwd or s["directory"].startswith(cwd + "/"))]
+    
+    # Find matching session
+    matches = []
+    for s in pool:
+        if (old_name.lower() in s["title"].lower() if s["title"] else False) or old_name == s["id"]:
+            matches.append(s)
+    
+    if not matches:
+        print(f"No sessions matching: {old_name}")
+        return
+    
+    if len(matches) > 1:
+        print(f"Multiple sessions match '{old_name}':\n")
+        for i, s in enumerate(matches, 1):
+            title = s["title"][:80] if s["title"] else "(unnamed)"
+            print(f"  {i}. {title:<50} {s['id']}")
+        print()
+        
+        try:
+            choice = input(f"Select session to rename (1-{len(matches)}): ").strip()
+            idx = int(choice) - 1
+            if idx < 0 or idx >= len(matches):
+                print("Invalid selection.")
+                return
+            session = matches[idx]
+        except (ValueError, KeyboardInterrupt):
+            print("Cancelled.")
+            return
+    else:
+        session = matches[0]
+    
+    title = session["title"][:80] if session["title"] else "(unnamed)"
+    print(f"Renaming session: {title}")
+    print(f"New name: {new_name}")
+    print()
+    
+    if confirm(f"Rename this session? [y/N] "):
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                UPDATE session 
+                SET title = ?, time_updated = ?
+                WHERE id = ?
+            """, (new_name, int(datetime.now().timestamp() * 1000), session["id"]))
+            
+            conn.commit()
+            conn.close()
+            
+            print(f"Session renamed to: {new_name}")
+        except sqlite3.Error as e:
+            print(f"Error renaming session: {e}")
+    else:
+        print("Cancelled.")
+
+
+def cmd_rename_fzf(sessions):
+    """Interactive session rename using fzf"""
+    try:
+        import subprocess
+    except ImportError:
+        print("Error: subprocess module not available")
+        return
+    
+    # Check if fzf is installed
+    try:
+        subprocess.run(["which", "fzf"], capture_output=True, check=True)
+    except subprocess.CalledProcessError:
+        print("Error: fzf is not installed. Please install fzf first.")
+        print("  macOS: brew install fzf")
+        print("  Ubuntu/Debian: sudo apt install fzf")
+        print("  Arch: sudo pacman -S fzf")
+        return
+    
+    # Prepare session list for fzf
+    session_lines = []
+    for s in sessions:
+        title = s["title"] if s["title"] else "(unnamed)"
+        tokens = format_number(s["total_tokens"])
+        cost = f"${s['total_cost']:.4f}" if s["total_cost"] > 0 else "-"
+        date = datetime.fromtimestamp(s["time_created"] / 1000).strftime("%Y-%m-%d %H:%M")
+        
+        # Format: title | tokens | cost | date | id
+        line = f"{title} | {tokens} tokens | {cost} | {date} | {s['id']}"
+        session_lines.append(line)
+    
+    # Run fzf to select session
+    fzf_input = "\n".join(session_lines)
+    
+    try:
+        result = subprocess.run(
+            ["fzf", "--height", "40%", "--prompt", "Select session to rename: "],
+            input=fzf_input.encode(),
+            capture_output=True,
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 130:  # Ctrl+C
+            print("Cancelled.")
+            return
+        elif e.returncode == 1:  # No selection
+            print("No session selected.")
+            return
+        else:
+            print(f"fzf error: {e}")
+            return
+    
+    selected_line = result.stdout.decode().strip()
+    if not selected_line:
+        print("No session selected.")
+        return
+    
+    # Parse selected session
+    parts = selected_line.split(" | ")
+    if len(parts) < 5:
+        print("Error parsing fzf output")
+        return
+    
+    session_id = parts[-1].strip()
+    
+    # Find the session
+    session = None
+    for s in sessions:
+        if s["id"] == session_id:
+            session = s
+            break
+    
+    if not session:
+        print(f"Session not found: {session_id}")
+        return
+    
+    # Get new name from user
+    old_title = session["title"] if session["title"] else "(unnamed)"
+    print(f"\nSelected session: {old_title}")
+    
+    try:
+        new_name = input("Enter new name: ").strip()
+    except KeyboardInterrupt:
+        print("\nCancelled.")
+        return
+    
+    if not new_name:
+        print("No name provided. Cancelled.")
+        return
+    
+    # Confirm rename
+    print(f"\nRenaming: {old_title}")
+    print(f"New name: {new_name}")
+    
+    if confirm(f"Rename this session? [y/N] "):
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                UPDATE session 
+                SET title = ?, time_updated = ?
+                WHERE id = ?
+            """, (new_name, int(datetime.now().timestamp() * 1000), session["id"]))
+            
+            conn.commit()
+            conn.close()
+            
+            print(f"Session renamed to: {new_name}")
+        except sqlite3.Error as e:
+            print(f"Error renaming session: {e}")
+    else:
+        print("Cancelled.")
+
+
 def install_script(system=False):
-    """Install opencode-sessions"""
+    """Install ocs"""
     script_path = os.path.abspath(__file__)
     script_dir = os.path.dirname(script_path)
-    script_name = os.path.basename(script_path)
-    completion_name = "opencode-sessions.fish"
+    script_name = "ocs"
+    completion_name = "ocs.fish"
     
     # Installation paths
     if system:
@@ -425,7 +605,7 @@ def install_script(system=False):
     
     # Install main script
     dest_script = os.path.join(install_dir, script_name)
-    print(f"Copying {script_name} to {dest_script}")
+    print(f"Copying ocs to {dest_script}")
     
     # Read current script content
     with open(script_path, 'r') as f:
@@ -439,7 +619,7 @@ def install_script(system=False):
     os.chmod(dest_script, 0o755)
     
     # Install fish completion if available
-    completion_src = os.path.join(script_dir, completion_name)
+    completion_src = os.path.join(script_dir, "..", "..", completion_name)
     if os.path.exists(completion_src):
         dest_completion = os.path.join(completion_dir, completion_name)
         print(f"Copying {completion_name} to {dest_completion}")
@@ -536,6 +716,17 @@ def main():
         idx = args.index("--delete")
         rest = args[idx + 1:]
         cmd_rm(sessions, " ".join(rest) if rest else None)
+    elif "--rename" in args:
+        idx = args.index("--rename")
+        rest = args[idx + 1:]
+        if len(rest) < 2:
+            print("Usage: ocs --rename <old-name-or-id> <new-name>")
+            sys.exit(1)
+        old_name = rest[0]
+        new_name = " ".join(rest[1:])
+        cmd_rename(sessions, old_name, new_name)
+    elif "--rename-fzf" in args:
+        cmd_rename_fzf(sessions)
     else:
         print(__doc__)
         sys.exit(1)
